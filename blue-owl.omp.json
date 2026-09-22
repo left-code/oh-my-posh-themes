@@ -95,7 +95,7 @@
           "leading_diamond": "\ue0ba",
           "foreground": "#3EC669",
           "background": "#29315A",
-          "template": " {{ readFile \"~/.cache/ai-usage/usage.txt\" }} "
+          "template": " {{ readFile (joinPath .Env.USERPROFILE \".cache/ai-usage/usage.txt\") }} "
         },
         {
           "properties": {
