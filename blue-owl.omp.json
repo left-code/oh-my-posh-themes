@@ -95,7 +95,7 @@
           "leading_diamond": "\ue0ba",
           "foreground": "#3EC669",
           "background": "#29315A",
-          "template": " {{ readFile (printf \"%s/.cache/ai-usage/usage.txt\" .Env.USERPROFILE) }} "
+          "template": " {{ if .Env.USERPROFILE }}{{ readFile (printf \"%s/.cache/ai-usage/usage.txt\" .Env.USERPROFILE) }}{{ else }}{{ readFile (printf \"%s/.cache/ai-usage/usage.txt\" .Env.HOME) }}{{ end }} "
         },
         {
           "properties": {
