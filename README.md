@@ -1,53 +1,89 @@
 # Oh My Posh Themes
 
-Custom [Oh My Posh](https://ohmyposh.dev/) themes for PowerShell.
+Custom [Oh My Posh](https://ohmyposh.dev/) themes with Git, system, runtime, and AI usage information.
 
 ## Blue Owl
 
-`blue-owl.omp.json` is a compact PowerShell theme with Git, memory, runtime, and AI usage information.
+`blue-owl.omp.json` is a compact theme for PowerShell and Zsh.
 
 ### AI Usage
 
-The theme can display current Codex and Claude usage instead of CPU usage:
+The theme displays current Codex and Claude usage:
 
 ```text
 >_ 74/12%  ◈ 100/49%
 ```
 
-* `>_` — Codex
-* `◈` — Claude
-* First value — current 5-hour/session usage
-* Second value — 7-day usage
+- `>_` — Codex
+- `◈` — Claude
+- First value — current 5-hour/session usage
+- Second value — 7-day usage
 
-Usage data is cached locally and refreshed asynchronously every 5 minutes to keep prompt rendering fast.
+Usage is cached locally and refreshed asynchronously every 5 minutes to keep prompt rendering fast.
 
-### Requirements
+## Requirements
 
-Install:
+Install [Oh My Posh](https://ohmyposh.dev/) and `uv`, then install the usage collectors:
 
-```powershell
+```shell
 uv tool install codex-cli-usage
 uv tool install ccusage
 ```
 
-Then install the local AI usage scripts:
+Codex CLI and Claude Code must be installed and authenticated.
+
+## Install AI Usage Scripts
+
+### Windows / PowerShell
 
 ```powershell
 irm https://raw.githubusercontent.com/left-code/oh-my-posh-themes/refs/heads/master/install.ps1 | iex
 ```
 
-### PowerShell Profile
+### Linux / WSL
 
-Add the following to `$PROFILE`:
+```bash
+curl -fsSL https://raw.githubusercontent.com/left-code/oh-my-posh-themes/refs/heads/master/install.sh | bash
+```
+
+The scripts are installed to:
+
+```text
+~/.config/oh-my-posh/
+```
+
+## Shell Configuration
+
+### PowerShell
+
+Add to `$PROFILE`:
 
 ```powershell
 oh-my-posh init pwsh --config "https://raw.githubusercontent.com/left-code/oh-my-posh-themes/refs/heads/master/blue-owl.omp.json" | Invoke-Expression
+
+& "$HOME/.config/oh-my-posh/ai-usage.ps1" | Out-Null
 ```
 
-Restart PowerShell or reload your profile:
+Reload:
 
 ```powershell
 . $PROFILE
+```
+
+### Zsh / WSL
+
+Add to `~/.zshrc`:
+
+```zsh
+eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/left-code/oh-my-posh-themes/refs/heads/master/blue-owl.omp.json')"
+
+"$HOME/.config/oh-my-posh/ai-usage.sh" >/dev/null 2>&1
+```
+
+Reload:
+
+```bash
+source ~/.zshrc
 ```
 
 ## Repository
@@ -61,4 +97,10 @@ Restart PowerShell or reload your profile:
     └── ai-usage-refresh.ps1
 ```
 
-The AI usage scripts are installed locally under `~/.config/oh-my-posh/`. No Codex or Claude credentials are stored by this repository.
+AI usage is stored in a small local cache under:
+
+```text
+~/.cache/ai-usage/
+```
+
+No Codex or Claude credentials are stored by this repository.
