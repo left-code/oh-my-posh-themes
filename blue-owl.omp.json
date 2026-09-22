@@ -90,16 +90,12 @@
           "type": "sysinfo"
         },
         {
-          "type": "command",
+          "type": "text",
           "style": "diamond",
           "leading_diamond": "\ue0ba",
           "foreground": "#3EC669",
           "background": "#29315A",
-          "properties": {
-            "shell": "pwsh",
-            "command": "& \"$HOME/.config/oh-my-posh/ai-usage.ps1\""
-          },
-          "template": " {{ .Output }} "
+          "template": " {{ cmd \"pwsh\" \"-NoLogo\" \"-NoProfile\" \"-NonInteractive\" \"-Command\" \"& \\\"$HOME/.config/oh-my-posh/ai-usage.ps1\\\"\" }} "
         },
         {
           "properties": {
