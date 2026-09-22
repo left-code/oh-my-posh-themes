@@ -34,12 +34,20 @@ if ($needsRefresh) {
     $refreshScript = Join-Path $PSScriptRoot "ai-usage-refresh.ps1"
 
     if (Test-Path $refreshScript) {
-        Start-Process pwsh `
+        $powerShellExe = if (Get-Command pwsh -ErrorAction SilentlyContinue) {
+            (Get-Command pwsh).Source
+        }
+        else {
+            "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+        }
+
+        Start-Process $powerShellExe `
             -WindowStyle Hidden `
             -ArgumentList @(
                 "-NoLogo",
                 "-NoProfile",
                 "-NonInteractive",
+                "-ExecutionPolicy", "Bypass",
                 "-File",
                 "`"$refreshScript`""
             )
