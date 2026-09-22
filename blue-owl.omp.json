@@ -90,15 +90,16 @@
           "type": "sysinfo"
         },
         {
-          "properties": {
-            "time_format": "15:04:05"
-          },
+          "type": "command",
           "style": "diamond",
           "leading_diamond": "\ue0ba",
-          "template": " \ue266 CPU: {{ round .PhysicalPercentUsed .Precision }}% ",
           "foreground": "#3EC669",
           "background": "#29315A",
-          "type": "sysinfo"
+          "properties": {
+            "shell": "pwsh",
+            "command": "& \"$HOME/.config/oh-my-posh/ai-usage.ps1\""
+          },
+          "template": " {{ .Output }} "
         },
         {
           "properties": {
