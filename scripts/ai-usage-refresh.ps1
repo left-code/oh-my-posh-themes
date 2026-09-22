@@ -22,7 +22,7 @@ catch {
 }
 
 try {
-    $codex = codex-cli-usage json | ConvertFrom-Json
+    $codex  = codex-cli-usage json | ConvertFrom-Json
     $claude = ccusage json | ConvertFrom-Json
 
     $parts = @()
@@ -36,11 +36,21 @@ try {
     }
 
     if ($parts.Count -gt 0) {
-        ($parts -join "  ") |
-            Set-Content $cacheFile -NoNewline
+        # Use explicit UTF-8 without BOM.
+        # Do not depend on PowerShell's version-specific Set-Content defaults.
+        $utf8 = New-Object System.Text.UTF8Encoding($false)
 
-        (Get-Date).ToString("O") |
-            Set-Content $stampFile -NoNewline
+        [System.IO.File]::WriteAllText(
+            $cacheFile,
+            ($parts -join "  "),
+            $utf8
+        )
+
+        [System.IO.File]::WriteAllText(
+            $stampFile,
+            (Get-Date).ToString("O"),
+            $utf8
+        )
     }
 }
 finally {
