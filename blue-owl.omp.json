@@ -95,7 +95,7 @@
           "leading_diamond": "\ue0ba",
           "foreground": "#3EC669",
           "background": "#29315A",
-          "template": " {{ cmd \"pwsh\" \"-NoLogo\" \"-NoProfile\" \"-NonInteractive\" \"-Command\" \"& \\\"$HOME/.config/oh-my-posh/ai-usage.ps1\\\"\" }} "
+          "template": " {{ readFile \"~/.cache/ai-usage/usage.txt\" }} "
         },
         {
           "properties": {
