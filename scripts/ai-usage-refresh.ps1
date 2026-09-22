@@ -32,7 +32,7 @@ try {
     }
 
     if ($null -ne $claude.session -and $null -ne $claude.'7d') {
-        $parts += "◈ $([int]$claude.session.pct)/$([int]$claude.'7d'.pct)%"
+        $parts += "$([char]0x25C8) $([int]$claude.session.pct)/$([int]$claude.'7d'.pct)%"
     }
 
     if ($parts.Count -gt 0) {
