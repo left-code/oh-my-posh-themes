@@ -4,6 +4,7 @@ $cacheDir  = Join-Path $HOME ".cache\ai-usage"
 $cacheFile = Join-Path $cacheDir "usage.txt"
 $stampFile = Join-Path $cacheDir "updated.txt"
 $lockFile  = Join-Path $cacheDir "refresh.lock"
+$logFile   = Join-Path $cacheDir "refresh.log"
 
 New-Item -ItemType Directory -Force -Path $cacheDir | Out-Null
 
@@ -22,24 +23,52 @@ catch {
 }
 
 try {
-    $codex  = codex-cli-usage json | ConvertFrom-Json
-    $claude = ccusage json | ConvertFrom-Json
+    # Use explicit UTF-8 without BOM.
+    # Do not depend on PowerShell's version-specific Set-Content defaults.
+    $utf8 = New-Object System.Text.UTF8Encoding($false)
 
-    $parts = @()
+    # Each provider keeps its last good value, so one failed fetch
+    # (e.g. an expired Claude OAuth token) does not drop it from the prompt.
+    function Update-Part($name, $command, $format) {
+        $partFile = Join-Path $cacheDir "$name.txt"
+        $output = & $command 2>&1
+        $json = $output | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] } | Out-String
+        $data = if ($json.Trim()) { $json | ConvertFrom-Json } else { $null }
+        $part = if ($null -ne $data) { & $format $data } else { $null }
 
-    if ($null -ne $codex.'5h' -and $null -ne $codex.'7d') {
-        $parts += ">_ $([int]$codex.'5h'.pct)/$([int]$codex.'7d'.pct)%"
+        if ($part) {
+            [System.IO.File]::WriteAllText($partFile, $part, $utf8)
+        }
+        else {
+            $errors = $output | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] } | Out-String
+            [System.IO.File]::AppendAllText(
+                $logFile,
+                "$((Get-Date).ToString('O')) $name failed: $($errors.Trim())`n",
+                $utf8
+            )
+        }
+
+        if (Test-Path $partFile) {
+            return (Get-Content $partFile -Raw).Trim()
+        }
     }
 
-    if ($null -ne $claude.session -and $null -ne $claude.'7d') {
-        $parts += "$([char]0x25C8) $([int]$claude.session.pct)/$([int]$claude.'7d'.pct)%"
-    }
+    $parts = @(
+        Update-Part "codex" { codex-cli-usage json } {
+            param($d)
+            if ($null -ne $d.'5h' -and $null -ne $d.'7d') {
+                ">_ $([int]$d.'5h'.pct)/$([int]$d.'7d'.pct)%"
+            }
+        }
+        Update-Part "claude" { ccusage json } {
+            param($d)
+            if ($null -ne $d.session -and $null -ne $d.'7d') {
+                "$([char]0x25C8) $([int]$d.session.pct)/$([int]$d.'7d'.pct)%"
+            }
+        }
+    ) | Where-Object { $_ }
 
     if ($parts.Count -gt 0) {
-        # Use explicit UTF-8 without BOM.
-        # Do not depend on PowerShell's version-specific Set-Content defaults.
-        $utf8 = New-Object System.Text.UTF8Encoding($false)
-
         [System.IO.File]::WriteAllText(
             $cacheFile,
             ($parts -join "  "),

@@ -16,38 +16,52 @@ if ! flock -n 9; then
     exit 0
 fi
 
+LOG_FILE="$CACHE_DIR/refresh.log"
+
 parts=()
 
-# Codex
-if command -v codex-cli-usage >/dev/null 2>&1; then
-    codex_json=$(codex-cli-usage json 2>/dev/null || true)
+# Each provider keeps its last good value, so one failed fetch
+# (e.g. an expired Claude OAuth token) does not drop it from the prompt.
+# Usage: update_part <name> <command> <jq filter producing the part or empty>
+update_part() {
+    local name=$1 cmd=$2 filter=$3
+    local part_file="$CACHE_DIR/$name.txt"
+    local json part="" err_file
 
-    if [[ -n "$codex_json" ]]; then
-        codex_5h=$(jq -r '."5h".pct // empty' <<< "$codex_json")
-        codex_7d=$(jq -r '."7d".pct // empty' <<< "$codex_json")
+    if command -v "$cmd" >/dev/null 2>&1; then
+        err_file=$(mktemp)
+        json=$("$cmd" json 2>"$err_file" || true)
 
-        if [[ -n "$codex_5h" && -n "$codex_7d" ]]; then
-            parts+=(">_ ${codex_5h}/${codex_7d}%")
+        if [[ -n "$json" ]]; then
+            part=$(jq -r "$filter" <<< "$json" 2>/dev/null || true)
         fi
-    fi
-fi
 
-# Claude
-if command -v ccusage >/dev/null 2>&1; then
-    claude_json=$(ccusage json 2>/dev/null || true)
-
-    if [[ -n "$claude_json" ]]; then
-        claude_session=$(jq -r '.session.pct // empty' <<< "$claude_json")
-        claude_7d=$(jq -r '."7d".pct // empty' <<< "$claude_json")
-
-        if [[ -n "$claude_session" && -n "$claude_7d" ]]; then
-            parts+=("◈ ${claude_session}/${claude_7d}%")
+        if [[ -n "$part" ]]; then
+            printf '%s' "$part" > "$part_file"
+        else
+            printf '%s %s failed: %s
+' "$(date --iso-8601=seconds)" "$name" "$(tr '
+' ' ' < "$err_file")" >> "$LOG_FILE"
         fi
-    fi
-fi
 
-# Do not overwrite a valid cache if both providers failed.
+        rm -f "$err_file"
+    fi
+
+    if [[ -s "$part_file" ]]; then
+        parts+=("$(cat "$part_file")")
+    fi
+}
+
+update_part codex codex-cli-usage \
+    'if ."5h".pct != null and ."7d".pct != null then ">_ \(."5h".pct | floor)/\(."7d".pct | floor)%" else empty end'
+
+update_part claude ccusage \
+    'if .session.pct != null and ."7d".pct != null then "◈ \(.session.pct | floor)/\(."7d".pct | floor)%" else empty end'
+
+# Do not overwrite a valid cache if both providers have never succeeded.
 if (( ${#parts[@]} > 0 )); then
-    printf '%s' "$(IFS='  '; echo "${parts[*]}")" > "$CACHE_FILE"
+    out=${parts[0]}
+    for p in "${parts[@]:1}"; do out+="  $p"; done
+    printf '%s' "$out" > "$CACHE_FILE"
     date --iso-8601=seconds > "$STAMP_FILE"
 fi
