@@ -86,17 +86,6 @@
         },
         {
           "properties": {
-            "source": "cli|pwsh"
-          },
-          "style": "powerline",
-          "template": "  {{ .Name }} ",
-          "foreground": "#000000",
-          "powerline_symbol": "",
-          "background": "#9ec3f0",
-          "type": "az"
-        },
-        {
-          "properties": {
             "style": "dallas",
             "threshold": 0
           },
