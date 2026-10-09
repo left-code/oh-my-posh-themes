@@ -20,7 +20,7 @@
           "powerline_symbol": "",
           "foreground": "#43CCEA",
           "background": "#29315A",
-          "template": "{{ if .FiveHourResetsIn }} 5h {{ .FiveHourUsage.String }}%  {{ .FiveHourResetsIn.Round 60000000000 }} {{ end }}{{ if .SevenDayResetsIn }} 7d {{ .SevenDayUsage.String }}%  {{ .SevenDayResetsIn.Round 3600000000000 }} {{ end }}"
+          "template": "{{ if .FiveHourResetsIn }} 5h {{ .FiveHourUsage.String }}%  {{ $m := int .FiveHourResetsIn.Minutes }}{{ div $m 60 }}h {{ mod $m 60 }}m {{ end }}{{ if .SevenDayResetsIn }} 7d {{ .SevenDayUsage.String }}%  {{ $h := int .SevenDayResetsIn.Hours }}{{ if ge $h 24 }}{{ div $h 24 }}d {{ end }}{{ mod $h 24 }}h {{ end }}"
         },
         {
           "type": "path",
