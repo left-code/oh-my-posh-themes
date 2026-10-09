@@ -90,14 +90,6 @@
           "type": "sysinfo"
         },
         {
-          "style": "diamond",
-          "leading_diamond": "\ue0ba",
-          "template": " \ue266 CPU: {{ round .PhysicalPercentUsed .Precision }}% ",
-          "foreground": "#3EC669",
-          "background": "#29315A",
-          "type": "sysinfo"
-        },
-        {
           "properties": {
             "mapped_shell_names": {
               "pwsh": "PS"
