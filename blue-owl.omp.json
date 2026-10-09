@@ -90,12 +90,12 @@
           "type": "sysinfo"
         },
         {
-          "type": "text",
           "style": "diamond",
           "leading_diamond": "\ue0ba",
+          "template": " \ue266 CPU: {{ round .PhysicalPercentUsed .Precision }}% ",
           "foreground": "#3EC669",
           "background": "#29315A",
-          "template": " {{ if .Env.USERPROFILE }}{{ readFile (printf \"%s/.cache/ai-usage/usage.txt\" .Env.USERPROFILE) }}{{ else }}{{ readFile (printf \"%s/.cache/ai-usage/usage.txt\" .Env.HOME) }}{{ end }} "
+          "type": "sysinfo"
         },
         {
           "properties": {
