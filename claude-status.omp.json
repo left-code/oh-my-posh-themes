@@ -23,14 +23,6 @@
           "template": "{{ if .FiveHourResetsIn }} 5h {{ .FiveHourUsage.String }}%  {{ .FiveHourResetsIn.Round 60000000000 }} {{ end }}{{ if .SevenDayResetsIn }} 7d {{ .SevenDayUsage.String }}%  {{ .SevenDayResetsIn.Round 3600000000000 }} {{ end }}"
         },
         {
-          "type": "claude",
-          "style": "powerline",
-          "powerline_symbol": "",
-          "foreground": "#3EC669",
-          "background": "#29315A",
-          "template": "  {{ .FormattedCost }} "
-        },
-        {
           "type": "path",
           "style": "powerline",
           "powerline_symbol": "",
