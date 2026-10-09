@@ -123,7 +123,7 @@
         {
           "style": "diamond",
           "leading_diamond": "",
-          "template": "  MEM: {{ round .PhysicalPercentUsed .Precision }}% ",
+          "template": "  {{ round .PhysicalPercentUsed .Precision }}% ",
           "foreground": "#3EC669",
           "background": "#29315A",
           "type": "sysinfo"
