@@ -21,6 +21,13 @@
           "type": "os"
         },
         {
+          "style": "plain",
+          "template": "{{ if .SSHSession }} {{ .UserName }}@{{ .HostName }} {{ end }}",
+          "foreground": "#FFEB3B",
+          "background": "transparent",
+          "type": "session"
+        },
+        {
           "properties": {
             "folder_icon": "...",
             "folder_separator_icon": "<transparent> \ue0bd </>",
@@ -52,6 +59,41 @@
             "{{ if gt .Ahead 0 }}#B388FF{{ end }}",
             "{{ if gt .Behind 0 }}#B388FF{{ end }}"
           ]
+        },
+        {
+          "style": "powerline",
+          "template": " {{ if .Version }} {{ .Version }}{{ end }} ",
+          "foreground": "#ffffff",
+          "powerline_symbol": "",
+          "background": "#6C3483",
+          "type": "project"
+        },
+        {
+          "style": "powerline",
+          "template": "  {{ .Full }} ",
+          "foreground": "#ffffff",
+          "powerline_symbol": "",
+          "background": "#512BD4",
+          "type": "dotnet"
+        },
+        {
+          "style": "powerline",
+          "template": "  {{ .WorkspaceName }} ",
+          "foreground": "#ffffff",
+          "powerline_symbol": "",
+          "background": "#5C4EE5",
+          "type": "terraform"
+        },
+        {
+          "properties": {
+            "source": "cli|pwsh"
+          },
+          "style": "powerline",
+          "template": "  {{ .Name }} ",
+          "foreground": "#000000",
+          "powerline_symbol": "",
+          "background": "#9ec3f0",
+          "type": "az"
         },
         {
           "properties": {
